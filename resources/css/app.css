@@ -1,0 +1,697 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* CSS Custom Properties for Design Tokens */
+    :root {
+        /* Light theme (default) */
+        --color-primary: 20 15% 25%;
+        --color-primary-foreground: 0 0% 98%;
+        --color-secondary: 40 10% 90%;
+        --color-secondary-foreground: 20 15% 25%;
+        --color-background: 0 0% 100%;
+        --color-foreground: 20 15% 15%;
+        --color-muted: 40 10% 94%;
+        --color-muted-foreground: 20 10% 45%;
+        --color-border: 40 10% 88%;
+        --color-ring: 20 15% 25%;
+    }
+
+    .dark {
+        --color-primary: 40 10% 90%;
+        --color-primary-foreground: 20 15% 10%;
+        --color-secondary: 20 10% 20%;
+        --color-secondary-foreground: 40 10% 90%;
+        --color-background: 20 15% 8%;
+        --color-foreground: 40 10% 95%;
+        --color-muted: 20 10% 15%;
+        --color-muted-foreground: 40 10% 65%;
+        --color-border: 20 10% 20%;
+        --color-ring: 40 10% 90%;
+    }
+
+    /* Base HTML */
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        border-width: 0;
+        border-style: solid;
+        border-color: hsl(var(--color-border));
+    }
+
+    html {
+        font-size: 16px;
+        scroll-behavior: smooth;
+        /* Keep anchored sections clear of the sticky header. */
+        scroll-padding-top: 6rem;
+        -webkit-text-size-adjust: 100%;
+        -moz-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+
+    /* <picture> must not create a layout box, so the responsive <img> inside
+       it is sized by its block container instead of an inline wrapper. */
+    picture {
+        display: contents;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+    }
+
+    body {
+        margin: 0;
+        font-family: theme('fontFamily.sans');
+        font-size: theme('fontSize.body[0]');
+        line-height: theme('fontSize.body[1].lineHeight');
+        letter-spacing: theme('fontSize.body[1].letterSpacing');
+        font-weight: theme('fontSize.body[1].fontWeight');
+        color: hsl(var(--color-foreground));
+        background-color: hsl(var(--color-background));
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: theme('fontFamily.display');
+        font-weight: 400;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        color: hsl(var(--color-foreground));
+        margin: 0 0 1rem;
+    }
+
+    h1 { font-size: theme('fontSize.display-xl[0]'); line-height: theme('fontSize.display-xl[1].lineHeight'); letter-spacing: theme('fontSize.display-xl[1].letterSpacing'); }
+    h2 { font-size: theme('fontSize.display-lg[0]'); line-height: theme('fontSize.display-lg[1].lineHeight'); letter-spacing: theme('fontSize.display-lg[1].letterSpacing'); }
+    h3 { font-size: theme('fontSize.display-md[0]'); line-height: theme('fontSize.display-md[1].lineHeight'); letter-spacing: theme('fontSize.display-md[1].letterSpacing'); }
+    h4 { font-size: theme('fontSize.display-sm[0]'); line-height: theme('fontSize.display-sm[1].lineHeight'); letter-spacing: theme('fontSize.display-sm[1].letterSpacing'); }
+    h5 { font-size: theme('fontSize.heading-lg[0]'); line-height: theme('fontSize.heading-lg[1].lineHeight'); }
+    h6 { font-size: theme('fontSize.heading-md[0]'); line-height: theme('fontSize.heading-md[1].lineHeight'); }
+
+    p {
+        margin: 0 0 1.5rem;
+        max-width: 65ch;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 150ms ease;
+    }
+
+    a:hover {
+        color: hsl(var(--color-primary));
+    }
+
+    a:focus-visible {
+        outline: 2px solid hsl(var(--color-ring));
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+
+    /* Card rise reveal is gated by scroll (IO adds .is-visible) via app.js; paused
+       animations still apply their first keyframe state, so elements sit hidden
+       until they enter the viewport. Reduced-motion browsers get the finished
+       state immediately via the duration reset below. */
+    .animate-fade-in-up,
+    .animate-fade-in,
+    .animate-slide-up,
+    .animate-slide-down,
+    .animate-scale-in {
+        animation-play-state: paused;
+    }
+
+    .animate-fade-in-up.is-visible,
+    .animate-fade-in.is-visible,
+    .animate-slide-up.is-visible,
+    .animate-slide-down.is-visible,
+    .animate-scale-in.is-visible {
+        animation-play-state: running;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-delay: 0ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+
+    /* Focus visible for all interactive elements */
+    button:focus-visible,
+    [role="button"]:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    summary:focus-visible {
+        outline: 2px solid hsl(var(--color-ring));
+        outline-offset: 2px;
+    }
+
+    /* Selection */
+    ::selection {
+        background-color: hsl(var(--color-primary) / 0.2);
+        color: hsl(var(--color-foreground));
+    }
+
+    /* Images */
+    img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    /* Form elements */
+    input,
+    textarea,
+    select {
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit;
+    }
+
+    /* Skip link */
+    .skip-link {
+        position: absolute;
+        top: -100%;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 0.75rem 1.5rem;
+        background: hsl(var(--color-primary));
+        color: hsl(var(--color-primary-foreground));
+        border-radius: 0.375rem;
+        z-index: 9999;
+        font-weight: 500;
+    }
+
+    .skip-link:focus {
+        top: 1rem;
+    }
+}
+
+/* Section rhythm: subtle gradient divider between stacked sections */
+.section + .section {
+    position: relative;
+}
+
+.section + .section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    max-width: 600px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(199 67 44 / 0.15), transparent);
+}
+
+@layer components {
+    /* Button Variants */
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-md px-5 py-3 text-body-sm font-medium transition-all duration-150 ease-out;
+        @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+        @apply disabled:pointer-events-none disabled:opacity-50;
+    }
+
+    .btn-primary {
+        @apply btn bg-stone-900 text-white hover:bg-stone-900/90 active:bg-stone-900/[0.95];
+        @apply dark:bg-white dark:text-stone-900 dark:hover:bg-white/90;
+    }
+
+    .btn-secondary {
+        @apply btn bg-stone-100 text-stone-900 hover:bg-stone-200 active:bg-stone-200/80 border border-stone-200;
+        @apply dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700 dark:border-stone-700;
+    }
+
+    .btn-outline {
+        @apply btn border-2 border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white;
+        @apply dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-stone-900;
+    }
+
+    .btn-ghost {
+        @apply btn text-stone-700 hover:bg-stone-100 active:bg-stone-200/80;
+        @apply dark:text-stone-300 dark:hover:bg-stone-800;
+    }
+
+    .btn-link {
+        @apply btn p-0 text-stone-700 underline-offset-2 hover:underline;
+        @apply dark:text-stone-300;
+    }
+
+    .btn-sm {
+        @apply px-3 py-1.5 text-caption;
+    }
+
+    .btn-lg {
+        @apply px-8 py-4 text-body;
+    }
+
+    /* Input Variants */
+    .input {
+        @apply w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-body text-stone-900 placeholder:text-stone-400;
+        @apply transition-colors duration-150;
+        @apply hover:border-stone-400;
+        @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0 focus:border-transparent;
+        @apply disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-stone-50;
+        @apply dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:placeholder:text-stone-500 dark:hover:border-stone-600;
+    }
+
+    .input-error {
+        @apply border-red-500 focus:ring-red-500;
+    }
+
+    .label {
+        @apply block mb-1.5 text-body-sm font-medium text-stone-700 dark:text-stone-300;
+    }
+
+    .input-group {
+        @apply flex flex-col gap-1.5;
+    }
+
+    .helper-text {
+        @apply text-caption text-stone-500 dark:text-stone-400;
+    }
+
+    .error-text {
+        @apply text-caption text-red-600 dark:text-red-400;
+    }
+
+    /* Card */
+    .card {
+        @apply rounded-lg border border-stone-200 bg-white shadow-soft transition-shadow duration-300;
+        @apply dark:border-stone-800 dark:bg-stone-900;
+    }
+
+    .card-hover {
+        @apply card hover:shadow-card;
+    }
+
+    .card-elevated {
+        @apply rounded-lg border border-stone-200 bg-white shadow-elevated;
+        @apply dark:border-stone-800 dark:bg-stone-900;
+    }
+
+    /* Premium card — a warm sheen that fades in across the surface on hover */
+    .card-sheen {
+        position: relative;
+    }
+
+    .card-sheen::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 50%), rgb(199 67 44 / 0.12), rgb(199 67 44 / 0) 62%);
+        opacity: 0;
+        transition: opacity 300ms ease;
+    }
+
+    .group:hover .card-sheen::after,
+    .card-sheen:hover::after {
+        opacity: 1;
+    }
+
+    /* Media frame — imagery zooms gently inside the card with a lifelike saturation shift */
+    .card-media {
+        overflow: hidden;
+    }
+
+    .card-media img {
+        transition: transform 700ms cubic-bezier(0.19, 1, 0.22, 1), filter 500ms ease;
+        filter: saturate(0.92);
+    }
+
+    .group:hover .card-media img,
+    .card-media:hover img {
+        transform: scale(1.07);
+        filter: saturate(1.12);
+    }
+
+    /* Glass chip for labels that sit over card imagery */
+    .card-chip {
+        @apply inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-caption font-medium text-stone-800 shadow-soft backdrop-blur-sm;
+        @apply dark:bg-stone-900/85 dark:text-stone-100;
+    }
+
+    /* The card is its own hover target: lift it with an accent-tinted border */
+    .card.group:hover {
+        @apply shadow-elevated;
+        border-color: rgb(199 67 44 / 0.3);
+    }
+
+    /* Decorative gradient bar + lift for feature tiles */
+    .feature-tile {
+        @apply transition-all duration-300;
+    }
+
+    .feature-tile::before {
+        content: '';
+        display: block;
+        width: 2.5rem;
+        height: 0.25rem;
+        border-radius: 9999px;
+        background: linear-gradient(90deg, #c7432c, #e3745c);
+        margin: 0 auto 1rem;
+    }
+
+    .feature-tile:hover {
+        @apply -translate-y-1 shadow-card;
+    }
+
+    /* Colorful gradient dots for the process steps — each hue cycles with nth-child */
+    .process-dot {
+        @apply inline-flex items-center justify-center w-12 h-12 rounded-full text-white font-medium mb-4;
+    }
+
+    .process-step:nth-child(4n + 1) .process-dot { background: linear-gradient(135deg, #c7432c, #e3745c); }
+    .process-step:nth-child(4n + 2) .process-dot { background: linear-gradient(135deg, #0f766e, #14b8a6); }
+    .process-step:nth-child(4n + 3) .process-dot { background: linear-gradient(135deg, #b45309, #f59e0b); }
+    .process-step:nth-child(4n + 4) .process-dot { background: linear-gradient(135deg, #374151, #6b7280); }
+
+    /* Office/location icon tour */
+    .office-icon {
+        @apply inline-flex items-center justify-center h-11 w-11 rounded-xl bg-accent-50 text-accent-600;
+        @apply dark:bg-accent-900/30 dark:text-accent-300;
+    }
+
+    /* Avatar placeholder for team members without a photo */
+    .avatar-placeholder {
+        @apply bg-gradient-to-br from-accent-100 via-stone-200 to-stone-300;
+        @apply dark:from-stone-700 dark:via-stone-800 dark:to-stone-900;
+    }
+
+    /* Subtle architectural blueprint-grid decoration for dark bands */
+    .blueprint-grid {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M0 0h48M0 0v48' fill='none' stroke='white' stroke-opacity='0.07'/%3E%3C/svg%3E");
+    }
+
+    /* Interactive Bangladesh district map */
+    .bd-map {
+        display: block;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
+    .bd-map .district-group {
+        transform-box: fill-box;
+        transform-origin: center;
+        transition: transform 280ms cubic-bezier(0.19, 1, 0.22, 1), filter 280ms ease;
+        cursor: pointer;
+    }
+
+    .bd-map .district-group:hover {
+        transform: scale(1.03) translateY(-2px);
+        filter: drop-shadow(0 12px 12px rgb(0 0 0 / 0.18));
+    }
+
+    .bd-map .district-group:hover path {
+        fill: #c7432c;
+    }
+
+    .bd-map .district-name {
+        font-size: 8.5px;
+        font-weight: 600;
+        fill: #5b5752;
+        paint-order: stroke;
+        stroke: rgba(255, 255, 255, 0.85);
+        stroke-width: 2.5;
+        pointer-events: none;
+        transition: fill 200ms ease;
+    }
+
+    .bd-map .district-group:hover .district-name {
+        fill: #ffffff;
+        stroke: #c7432c;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .bd-map .district-group path {
+            stroke: #292012;
+        }
+
+        .bd-map .district-name {
+            fill: #d1cbc5;
+            stroke: rgba(0, 0, 0, 0.75);
+        }
+
+        .bd-map .district-group:hover .district-name {
+            fill: #ffffff;
+            stroke: rgba(199, 67, 44, 0.95);
+        }
+    }
+
+    /* Pulsing office markers on the Bangladesh district map */
+    .office-pin-pulse {
+        transform-box: fill-box;
+        transform-origin: center;
+        opacity: 0.5;
+        animation: office-pulse 2.1s ease-out infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .office-pin-pulse { animation: none; }
+    }
+
+    @keyframes office-pulse {
+        0% { transform: scale(1); opacity: 0.5; }
+        100% { transform: scale(2.6); opacity: 0; }
+    }
+
+    /* Slow Ken-Burns zoom on the active hero slide — the animation restarts each
+       time the x-show slider makes a new slide visible */
+    @keyframes slide-kenburns {
+        from { transform: scale(1); }
+        to { transform: scale(1.07); }
+    }
+
+    .slide-kenburns {
+        animation: slide-kenburns 7.5s linear forwards;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .slide-kenburns { animation: none; }
+    }
+
+    /* Badge */
+    .badge {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-overline font-medium;
+    }
+
+    .badge-primary {
+        @apply badge bg-stone-900 text-white;
+        @apply dark:bg-white dark:text-stone-900;
+    }
+
+    .badge-secondary {
+        @apply badge bg-stone-100 text-stone-700;
+        @apply dark:bg-stone-800 dark:text-stone-300;
+    }
+
+    .badge-outline {
+        @apply badge border border-stone-300 text-stone-700;
+        @apply dark:border-stone-600 dark:text-stone-300;
+    }
+
+    .badge-accent {
+        @apply badge bg-accent-100 text-accent-800;
+        @apply dark:bg-accent-900/30 dark:text-accent-300;
+    }
+
+    /* Section */
+    .section {
+        @apply py-10 md:py-14 lg:py-16;
+    }
+
+    /* Alternate section backgrounds for visual rhythm */
+    .section-alt {
+        background-color: rgb(250 250 249 / 0.5);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .section-alt {
+            background-color: rgb(12 10 9 / 0.3);
+        }
+    }
+
+    .container {
+        @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    }
+
+    /* Grid */
+    .grid-auto-fit {
+        @apply grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+    }
+
+    .grid-auto-fit-2 {
+        @apply grid gap-6 md:grid-cols-2;
+    }
+
+    .grid-auto-fit-3 {
+        @apply grid gap-6 md:grid-cols-2 lg:grid-cols-3;
+    }
+
+    /* Prose overrides for Tailwind Typography */
+    .prose {
+        @apply text-stone-700 dark:text-stone-300;
+        @apply max-w-none;
+    }
+
+    .prose h1, .prose h2, .prose h3, .prose h4 {
+        @apply text-stone-900 dark:text-stone-100;
+    }
+
+    .prose a {
+        @apply text-accent-600 underline underline-offset-2 decoration-accent-200 hover:decoration-accent-400;
+        @apply dark:text-accent-400 dark:decoration-accent-700 dark:hover:decoration-accent-300;
+    }
+
+    .prose code {
+        @apply bg-stone-100 px-1.5 py-0.5 rounded text-sm font-mono text-stone-800;
+        @apply dark:bg-stone-800 dark:text-stone-200;
+    }
+
+    .prose pre {
+        @apply bg-stone-950 rounded-lg p-4 overflow-x-auto;
+        @apply dark:bg-stone-950;
+    }
+
+    .prose pre code {
+        @apply bg-transparent p-0 text-stone-100;
+    }
+
+    .prose blockquote {
+        @apply border-l-4 border-stone-300 pl-6 italic text-stone-600;
+        @apply dark:border-stone-600 dark:text-stone-400;
+    }
+
+    .prose img {
+        @apply rounded-lg shadow-soft;
+    }
+
+    /* Table */
+    .table-container {
+        @apply overflow-x-auto;
+    }
+
+    .table {
+        @apply w-full caption-bottom text-sm;
+    }
+
+    .table th {
+        @apply text-left font-medium text-stone-700 p-4 border-b border-stone-200;
+        @apply dark:text-stone-300 dark:border-stone-700;
+    }
+
+    .table td {
+        @apply p-4 border-b border-stone-100;
+        @apply dark:border-stone-800;
+    }
+
+    .table tr:last-child td {
+        @apply border-b-0;
+    }
+
+    /* Divider */
+    .divider {
+        @apply h-px bg-stone-200 border-0;
+        @apply dark:bg-stone-800;
+    }
+
+    .divider-vertical {
+        @apply w-px h-full bg-stone-200 border-0;
+        @apply dark:bg-stone-800;
+    }
+
+    /* Utility for aspect ratios */
+    .aspect-video { aspect-ratio: 16 / 9; }
+    .aspect-square { aspect-ratio: 1 / 1; }
+    .aspect-portrait { aspect-ratio: 3 / 4; }
+    .aspect-golden { aspect-ratio: 1.618 / 1; }
+
+    /* Animation delays */
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    .delay-300 { animation-delay: 300ms; }
+    .delay-400 { animation-delay: 400ms; }
+    .delay-500 { animation-delay: 500ms; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: hsl(var(--color-muted));
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: hsl(var(--color-muted-foreground) / 0.3);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: hsl(var(--color-muted-foreground) / 0.5);
+    }
+}
+
+@layer utilities {
+    /* Text balance */
+    .text-balance {
+        text-wrap: balance;
+    }
+
+    /* Gradient text */
+    .text-gradient {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-stone-900 to-stone-600;
+        @apply dark:from-white dark:to-stone-300;
+    }
+
+    /* Glass effect */
+    .glass {
+        @apply bg-white/80 backdrop-blur-md;
+        @apply dark:bg-stone-950/80;
+    }
+
+    .glass-strong {
+        @apply bg-white/90 backdrop-blur-lg;
+        @apply dark:bg-stone-950/90;
+    }
+
+    /* Visually hidden */
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    /* Focus trap for modals */
+    .focus-trap:focus-within {
+        @apply relative z-50;
+    }
+
+    /* Alpine — keeps x-cloak elements hidden until Alpine initialises */
+    [x-cloak] {
+        display: none !important;
+    }
+}

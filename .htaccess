@@ -1,0 +1,85 @@
+<IfModule mod_negotiation.c>
+    Options -MultiViews -Indexes
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# Update Architects & Engineering - root front controller
+#
+# This file only takes effect when the whole project is uploaded into the
+# document root (public_html/), which is the usual cPanel File Manager upload.
+# It decides in a single pass whether a request is a static asset or a route,
+# serves uploaded media without needing `php artisan storage:link`, and makes
+# sure application files (.env, composer.json, vendor/, storage/logs, ...) are
+# never handed to Apache.
+#
+# Static assets are dispatched to ./public/..., routes to ./index.php (a thin
+# shim that boots public/index.php). Going through the root-level index.php
+# keeps SCRIPT_NAME correct: Symfony derives the URL base from SCRIPT_NAME, so
+# rewriting routes straight to public/index.php would make Laravel believe it
+# lives under a "/public" sub-directory and 404 every page.
+#
+# If the document root points at the project's public/ folder instead, this
+# file is never read and public/.htaccess takes over - in that setup run
+# `php artisan storage:link` once so /storage/* resolves.
+#
+# Deliberately uses REQUEST_FILENAME (recomputed after every rewrite) instead of
+# DOCUMENT_ROOT for the rules that must work from a sub-folder too; only the
+# static-asset lookup in rule 4 uses DOCUMENT_ROOT, with rule 4b as the
+# sub-folder fallback.
+# -----------------------------------------------------------------------------
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 0) cPanel AutoSSL / Let's Encrypt write HTTP-01 tokens to
+    #    /.well-known/acme-challenge/ at the document root. Serve them as-is
+    #    so certificates can still be issued.
+    RewriteRule ^\.well-known(?:/|$) - [L]
+
+    # 0b) Hidden files are never served. This also keeps /.env from looping
+    #     through the asset rules below.
+    RewriteRule (^|/)\. - [F,L]
+
+    # 1) The front controller shim at the project root - stop here so Apache
+    #    executes ./index.php.
+    RewriteRule ^index\.php$ - [L]
+
+    # 2) ./public/<path> has already been resolved: serve it if it is a real
+    #    file, otherwise it is a route and belongs to Laravel.
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^public(?:/|$) - [L]
+
+    RewriteRule ^public(?:/|$) index.php [L]
+
+    # 3) Uploaded media lives in storage/app/public, so the site works without
+    #    a storage symlink. Path traversal is refused up front and
+    #    storage/app/private, storage/framework and storage/logs end up in a
+    #    folder that never matches, then fall through to Laravel as a 404.
+    RewriteCond %{REQUEST_URI} !(?:^|/)\.\.(?:/|$)
+    RewriteRule ^storage/(?!app/public(?:/|$))(.*)$ storage/app/public/$1 [L]
+
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^storage/app/public(?:/|$) - [L]
+
+    RewriteRule ^storage/app/public(?:/|$) index.php [L]
+
+    # 4) Static asset that physically exists inside public/ (normal case when
+    #    this file sits at the document root).
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # 4b) Fallback for installs where this file lives in a sub-folder and
+    #     DOCUMENT_ROOT therefore points one level too high: probe public/ for
+    #     asset-looking paths (they end in an extension).
+    RewriteCond $1 \.[A-Za-z0-9]+/?$
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # 5) Everything else is a route.
+    RewriteRule ^(.*)$ index.php [L]
+</IfModule>
+
+# Defence in depth: even if the rewrite engine above is ever disabled or
+# re-ordered, never serve these straight from disk.
+<FilesMatch "^(?:\.env.*|\.git.*|\.htpass.*|composer\.(?:json|lock)|package(?:-lock)?\.json|phpunit\.xml|artisan)$">
+    Require all denied
+</FilesMatch>
