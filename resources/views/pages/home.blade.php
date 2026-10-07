@@ -46,9 +46,9 @@
                             @if($slide->featuredImage)
                                 <picture>
                                     @if($slide->mobileImage)
-                                        <source media="(max-width: 767px)" srcset="{{ $slide->mobileImage->getAvailableUrl(['large']) }}">
+                                        <source media="(max-width: 767px)" srcset="{{ $slide->mobileImage->responsiveSrcset() }}" sizes="100vw">
                                     @endif
-                                    <img src="{{ $slide->featuredImage->getAvailableUrl(['large']) }}" alt="{{ $slide->title }}" class="slide-kenburns w-full h-full object-cover opacity-60" width="1600" height="900" @if($i === 0) fetchpriority="high" @else loading="lazy" @endif>
+                                    <img src="{{ $slide->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $slide->featuredImage->responsiveSrcset() }}" sizes="100vw" alt="{{ $slide->title }}" class="slide-kenburns w-full h-full object-cover opacity-60" width="1600" height="900" @if($i === 0) fetchpriority="high" @else loading="lazy" @endif>
                                 </picture>
                             @else
                                 <div class="w-full h-full bg-gradient-to-br from-stone-900 via-stone-800 to-stone-950"></div>
@@ -104,7 +104,7 @@
                 >
                     <div class="absolute inset-0 z-0">
                         @if($service->featuredImage)
-                            <img src="{{ $service->featuredImage->getAvailableUrl(['large']) }}" alt="{{ $service->name }}" class="slide-kenburns w-full h-full object-cover opacity-60" loading="lazy" width="1440" height="1080">
+                            <img src="{{ $service->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $service->featuredImage->responsiveSrcset() }}" sizes="100vw" alt="{{ $service->name }}" class="slide-kenburns w-full h-full object-cover opacity-60" loading="lazy" width="1440" height="1080">
                         @else
                             <div class="w-full h-full bg-gradient-to-br from-stone-900 via-stone-800 to-accent-950"></div>
                         @endif
@@ -203,7 +203,7 @@
                     <div class="order-2 md:order-1">
                         @if($featuredProject->featuredImage)
                             <div class="group/photo [perspective:1400px]">
-                                <img src="{{ $featuredProject->featuredImage->getAvailableUrl(['large']) }}" alt="{{ $featuredProject->title }}" class="rounded-xl shadow-elevated w-full transition-transform duration-700 [transition-timing-function:cubic-bezier(0.19,1,0.22,1)] saturate-90 hover:scale-[1.04] hover:-rotate-1.5 hover:saturate-110 hover:shadow-2xl" width="800" height="600" loading="lazy">
+                                <img src="{{ $featuredProject->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $featuredProject->featuredImage->responsiveSrcset() }}" sizes="(min-width: 768px) 50vw, 100vw" alt="{{ $featuredProject->title }}" class="rounded-xl shadow-elevated w-full transition-transform duration-700 [transition-timing-function:cubic-bezier(0.19,1,0.22,1)] saturate-90 hover:scale-[1.04] hover:-rotate-1.5 hover:saturate-110 hover:shadow-2xl" width="800" height="600" loading="lazy">
                             </div>
                         @else
                             <x-ui.placeholder ratio="video" icon="photo" label="Project photo to be added" class="rounded-xl shadow-soft" />
@@ -265,7 +265,7 @@
                     <x-ui.card variant="premium" href="{{ route('services.show', $service->slug) }}" class="group p-8 flex flex-col h-full animate-fade-in-up" style="animation-delay: {{ ($loop->index % 3) * 100 }}ms">
                         @if($service->featuredImage)
                             <div class="card-media mb-6 rounded-lg">
-                                <img src="{{ $service->featuredImage->getAvailableUrl(['large']) }}" alt="{{ $service->name }}" class="w-full aspect-[4/3] object-cover" width="600" height="450" loading="lazy">
+                                <img src="{{ $service->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $service->featuredImage->responsiveSrcset() }}" sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" alt="{{ $service->name }}" class="w-full aspect-[4/3] object-cover" width="600" height="450" loading="lazy">
                             </div>
                         @else
                             <div class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent-50 text-accent-600 dark:bg-accent-900/30 dark:text-accent-300">
@@ -308,7 +308,7 @@
                     <a href="{{ route('projects.show', $project->slug) }}" class="group block">
                         <div class="rounded-lg overflow-hidden mb-4 ring-1 ring-stone-800 transition-all duration-300 group-hover:ring-accent-500/60">
                             @if($project->featuredImage)
-                                <img src="{{ $project->featuredImage->getAvailableUrl(['large']) }}" alt="{{ $project->title }}" class="w-full aspect-video object-cover transition-[transform,filter] duration-500 saturate-90 group-hover:scale-105 group-hover:saturate-110" loading="lazy" width="400" height="300">
+                                <img src="{{ $project->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $project->featuredImage->responsiveSrcset() }}" sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" alt="{{ $project->title }}" class="w-full aspect-video object-cover transition-[transform,filter] duration-500 saturate-90 group-hover:scale-105 group-hover:saturate-110" loading="lazy" width="400" height="300">
                             @else
                                 <x-ui.placeholder ratio="video" icon="photo" class="bg-stone-800" />
                             @endif

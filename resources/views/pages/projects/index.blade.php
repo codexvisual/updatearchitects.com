@@ -59,7 +59,7 @@
                     <x-ui.card variant="premium" class="h-full flex flex-col overflow-hidden">
                         <div class="card-media relative">
                             @if($project->featuredImage)
-                                <img src="{{ $project->featuredImage->getAvailableUrl(['large']) }}" alt="{{ $project->title }}" class="w-full aspect-[4/3] object-cover" loading="lazy" width="640" height="480">
+                                <img src="{{ $project->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $project->featuredImage->responsiveSrcset() }}" sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" alt="{{ $project->title }}" class="w-full aspect-[4/3] object-cover" loading="lazy" width="640" height="480">
                             @else
                                 <div class="w-full aspect-[4/3]">
                                     <x-ui.placeholder ratio="video" icon="photo" class="h-full" />

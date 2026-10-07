@@ -40,7 +40,7 @@
                     <x-ui.card variant="premium" href="{{ route('services.show', $service->slug) }}" class="group p-6 h-full flex flex-col animate-fade-in-up" style="animation-delay: {{ ($loop->index % 3) * 100 }}ms">
                         @if($service->featuredImage)
                             <div class="card-media mb-4 rounded-lg">
-                                <img src="{{ $service->featuredImage->getAvailableUrl(['large']) }}" alt="{{ $service->name }}" class="w-full aspect-[4/3] object-cover" loading="lazy" width="600" height="450">
+                                <img src="{{ $service->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $service->featuredImage->responsiveSrcset() }}" sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" alt="{{ $service->name }}" class="w-full aspect-[4/3] object-cover" loading="lazy" width="600" height="450">
                             </div>
                         @elseif($service->image_url)
                             <div class="card-media mb-4 rounded-lg">

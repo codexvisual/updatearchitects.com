@@ -44,7 +44,7 @@
 
     <div class="container py-12 md:py-16">
         @if($project->featuredImage)
-            <img src="{{ $project->featuredImage->getAvailableUrl(['large']) }}" alt="{{ $project->title }}" class="w-full rounded-xl shadow-elevated mb-12" width="1200" height="675">
+            <img src="{{ $project->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $project->featuredImage->responsiveSrcset() }}" sizes="(min-width: 1280px) 1216px, 100vw" alt="{{ $project->title }}" class="w-full rounded-xl shadow-elevated mb-12" width="1200" height="675">
         @else
             <x-ui.placeholder ratio="wide" icon="photo" label="Cover image to be added" class="rounded-xl shadow-soft mb-12" />
         @endif
@@ -138,7 +138,7 @@
                 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($project->images as $image)
                         <figure>
-                            <img src="{{ $image->media?->getAvailableUrl(['large']) }}" alt="{{ $image->alt ?? $project->title }}" class="w-full aspect-video object-cover rounded-lg" loading="lazy">
+                            <img src="{{ $image->media?->getAvailableUrl(['large']) }}" srcset="{{ $image->media?->responsiveSrcset() }}" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" alt="{{ $image->alt ?? $project->title }}" class="w-full aspect-video object-cover rounded-lg" loading="lazy">
                             @if($image->caption)
                                 <figcaption class="text-caption text-stone-500 mt-2">{{ $image->caption }}</figcaption>
                             @endif

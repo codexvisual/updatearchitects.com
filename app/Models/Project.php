@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasResponsiveMedia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,11 +14,14 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Project extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia, LogsActivity, SoftDeletes;
+    use HasFactory, HasResponsiveMedia, InteractsWithMedia, LogsActivity, SoftDeletes {
+        // Spatie ships an empty stub of this method; ours wins and generates
+        // the widths listed in config('media-library.responsive_widths').
+        HasResponsiveMedia::registerMediaConversions insteadof InteractsWithMedia;
+    }
 
     protected $fillable = ['slug', 'title', 'summary', 'category', 'location', 'client', 'year', 'status', 'featured', 'area', 'floors', 'description', 'design_concept', 'architecture_info', 'structural_info', 'engineering_info', 'geotechnical_info', 'construction_info', 'interior_info', 'consultant', 'featured_image_id', 'progress_overview', 'seo', 'published_at', 'sort_order', 'locale'];
 
@@ -44,16 +48,6 @@ class Project extends Model implements HasMedia
 
         $this->addMediaCollection('documents')
             ->acceptsMimeTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']);
-    }
-
-    public function registerMediaConversions(?Media $media = null): void
-    {
-        if (! extension_loaded('gd') && ! extension_loaded('imagick')) {
-            return;
-        }
-
-        $this->addMediaConversion('thumbnail')->width(480)->nonQueued();
-        $this->addMediaConversion('large')->width(1600)->nonQueued();
     }
 
     public function featuredImage(): BelongsTo

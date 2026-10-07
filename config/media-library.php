@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Media;
 use Spatie\ImageOptimizer\Optimizers\Avifenc;
 use Spatie\ImageOptimizer\Optimizers\Cwebp;
 use Spatie\ImageOptimizer\Optimizers\Gifsicle;
@@ -16,7 +17,6 @@ use Spatie\MediaLibrary\Conversions\ImageGenerators\Webp;
 use Spatie\MediaLibrary\Conversions\Jobs\PerformConversionsJob;
 use Spatie\MediaLibrary\Downloaders\DefaultDownloader;
 use Spatie\MediaLibrary\MediaCollections\FileAdder;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\MediaCollections\Models\Observers\MediaObserver;
 use Spatie\MediaLibrary\ResponsiveImages\Jobs\GenerateResponsiveImagesJob;
 use Spatie\MediaLibrary\ResponsiveImages\TinyPlaceholderGenerator\Blurred;
@@ -360,4 +360,22 @@ return [
      * disabled lazy loading globally in the service provider.
      */
     'force_lazy_loading' => env('FORCE_MEDIA_LIBRARY_LAZY_LOADING', true),
+
+    /*
+     * Widths the public views advertise through a srcset, keyed by the
+     * conversion name they belong to and ordered smallest first, which is the
+     * order a browser reads them in.
+     *
+     * This array is the single source of truth for responsive images:
+     * App\Models\Concerns\HasResponsiveMedia generates exactly these
+     * conversions and the Media::responsiveSrcset() macro only advertises
+     * these widths, so a file can never exist without a matching srcset entry
+     * or an srcset entry without a matching file. A width larger than the
+     * original image is dropped at render time rather than upscaled.
+     */
+    'responsive_widths' => [
+        'thumbnail' => 480,
+        'medium' => 800,
+        'large' => 1600,
+    ],
 ];

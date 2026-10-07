@@ -26,7 +26,7 @@
 
     <div class="container py-12 md:py-16">
         @if($service->featuredImage)
-            <img src="{{ $service->featuredImage->getAvailableUrl(['large']) }}" alt="{{ $service->name }}" class="w-full rounded-xl shadow-elevated mb-12" width="1200" height="675">
+            <img src="{{ $service->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $service->featuredImage->responsiveSrcset() }}" sizes="(min-width: 1280px) 1216px, 100vw" alt="{{ $service->name }}" class="w-full rounded-xl shadow-elevated mb-12" width="1200" height="675">
         @elseif($service->image_url)
             <img src="{{ $service->image_url }}" alt="{{ $service->name }}" class="w-full rounded-xl shadow-elevated mb-12" width="1200" height="675">
         @endif
@@ -79,7 +79,7 @@
                     @foreach($service->projects as $project)
                         <a href="{{ route('projects.show', $project->slug) }}" class="group">
                             @if($project->featuredImage)
-                                <img src="{{ $project->featuredImage->getAvailableUrl(['large']) }}" alt="{{ $project->title }}" class="w-full aspect-video object-cover rounded-lg mb-3" loading="lazy">
+                                <img src="{{ $project->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $project->featuredImage->responsiveSrcset() }}" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" alt="{{ $project->title }}" class="w-full aspect-video object-cover rounded-lg mb-3" loading="lazy">
                             @else
                                 <x-ui.placeholder ratio="video" icon="photo" class="mb-3" />
                             @endif

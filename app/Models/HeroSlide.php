@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasResponsiveMedia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,11 +11,14 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class HeroSlide extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia, LogsActivity, SoftDeletes;
+    use HasFactory, HasResponsiveMedia, InteractsWithMedia, LogsActivity, SoftDeletes {
+        // Spatie ships an empty stub of this method; ours wins and generates
+        // the widths listed in config('media-library.responsive_widths').
+        HasResponsiveMedia::registerMediaConversions insteadof InteractsWithMedia;
+    }
 
     protected $fillable = [
         'eyebrow', 'title', 'subtitle', 'cta_label', 'cta_url',
@@ -44,16 +48,6 @@ class HeroSlide extends Model implements HasMedia
         $this->addMediaCollection('featured_mobile')
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
             ->singleFile();
-    }
-
-    public function registerMediaConversions(?Media $media = null): void
-    {
-        if (! extension_loaded('gd') && ! extension_loaded('imagick')) {
-            return;
-        }
-
-        $this->addMediaConversion('thumbnail')->width(480)->nonQueued();
-        $this->addMediaConversion('large')->width(1600)->nonQueued();
     }
 
     public function featuredImage(): BelongsTo

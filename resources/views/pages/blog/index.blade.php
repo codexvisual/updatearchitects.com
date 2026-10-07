@@ -50,7 +50,7 @@
                                 <x-ui.card variant="premium" class="h-full flex flex-col overflow-hidden">
                                     <div class="card-media relative">
                                         @if($post->featuredImage)
-                                            <img src="{{ $post->featuredImage->getAvailableUrl(['large']) }}" alt="{{ $post->title }}" class="w-full aspect-[4/3] object-cover" loading="lazy" width="640" height="480">
+                                            <img src="{{ $post->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $post->featuredImage->responsiveSrcset() }}" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" alt="{{ $post->title }}" class="w-full aspect-[4/3] object-cover" loading="lazy" width="640" height="480">
                                         @else
                                             <div class="w-full aspect-[4/3]">
                                                 <x-ui.placeholder ratio="video" icon="photo" class="h-full" />

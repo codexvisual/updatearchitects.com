@@ -73,7 +73,7 @@
                             @foreach($member->projects as $project)
                                 <a href="{{ route('projects.show', $project->slug) }}" class="group">
                                     @if($project->featuredImage)
-                                        <img src="{{ $project->featuredImage->getAvailableUrl(['large']) }}" alt="{{ $project->title }}" class="w-full aspect-video object-cover rounded-lg mb-3" loading="lazy">
+                                        <img src="{{ $project->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $project->featuredImage->responsiveSrcset() }}" sizes="(min-width: 640px) 50vw, 100vw" alt="{{ $project->title }}" class="w-full aspect-video object-cover rounded-lg mb-3" loading="lazy">
                                     @else
                                         <x-ui.placeholder ratio="video" icon="photo" class="mb-3" />
                                     @endif

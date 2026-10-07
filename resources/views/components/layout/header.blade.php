@@ -1,5 +1,7 @@
 @php
     use App\Models\Menu;
+    use Illuminate\Support\Facades\Cache;
+    use Illuminate\Support\Facades\DB;
 
     $mainMenu = Menu::where('slug', 'main')->first();
     $menuItems = $mainMenu
@@ -7,6 +9,37 @@
         : collect();
 
     $currentPath = request()->path();
+
+    /*
+     * English is always offered; a second locale only once its content exists.
+     * The public queries filter by `locale` with no English fallback, so
+     * offering a language nobody has written yet would render empty listings
+     * and an empty main menu rather than a translated site. `menu_items` is
+     * what makes this fail closed - the header and footer build their
+     * navigation from it. Excluded: the `*_translations` overlay tables (the
+     * locale lives on the base table) and `contact_messages` /
+     * `consultation_leads` (submissions, whose locale only records what the
+     * sender was reading).
+     */
+    $availableLocales = ['en' => 'EN'];
+
+    $hasBengaliContent = Cache::remember('available-locales.bn', now()->addHour(), function () {
+        foreach ([
+            'hero_slides', 'settings', 'menus', 'menu_items', 'services',
+            'service_categories', 'projects', 'project_categories', 'team_members',
+            'offices', 'blog_posts', 'blog_categories', 'pages', 'tags',
+        ] as $table) {
+            if (! DB::table($table)->where('locale', 'bn')->exists()) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+
+    if ($hasBengaliContent) {
+        $availableLocales['bn'] = 'BN';
+    }
 @endphp
 <nav
     class="container relative"
@@ -62,9 +95,10 @@
 
         {{-- Right side --}}
         <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-            {{-- Language Switcher --}}
+            {{-- Language Switcher - offered only once a second locale actually has content --}}
+            @if(count($availableLocales) > 1)
             <div class="hidden sm:flex items-center rounded-lg border border-stone-200 p-0.5 dark:border-stone-700">
-                @foreach(['en' => 'EN', 'bn' => 'BN'] as $code => $label)
+                @foreach($availableLocales as $code => $label)
                     <a
                         href="{{ route('locale.switch', ['locale' => $code]) }}"
                         hreflang="{{ $code }}"
@@ -79,6 +113,7 @@
                     </a>
                 @endforeach
             </div>
+            @endif
 
             {{-- Desktop CTAs --}}
             <a href="{{ route('contact') }}" class="btn-ghost hidden xl:inline-flex btn-sm">Contact Us</a>
@@ -148,8 +183,10 @@
                 <a href="{{ route('consultation') }}" class="btn-primary w-full" @click="mobileMenuOpen = false">Start Your Project</a>
                 <a href="{{ route('contact') }}" class="btn-secondary w-full" @click="mobileMenuOpen = false">Contact Us</a>
 
+                {{-- Language Switcher - offered only once a second locale actually has content --}}
+                @if(count($availableLocales) > 1)
                 <div class="flex items-center rounded-lg border border-stone-200 p-0.5 dark:border-stone-700 sm:hidden">
-                    @foreach(['en' => 'EN', 'bn' => 'BN'] as $code => $label)
+                    @foreach($availableLocales as $code => $label)
                         <a
                             href="{{ route('locale.switch', ['locale' => $code]) }}"
                             hreflang="{{ $code }}"
@@ -163,6 +200,7 @@
                         </a>
                     @endforeach
                 </div>
+                @endif
             </div>
         </div>
     </div>
