@@ -83,7 +83,10 @@
         font-weight: 400;
         line-height: 1.2;
         letter-spacing: -0.02em;
-        color: hsl(var(--color-foreground));
+        /* No `color` here on purpose: headings must inherit so that
+           `text-white` / `text-accent-100` on a coloured ancestor section
+           actually wins. An element-level rule would beat that inheritance
+           and leave dark headings on the dark/accent bands. */
         margin: 0 0 1rem;
     }
 
@@ -289,9 +292,16 @@
     }
 
     /* Card */
+    /*
+     * Every card shares one silhouette: a generous radius, a border softened
+     * below full strength so the edge reads as a seam rather than a box, and an
+     * elevation that steps up on hover. White is kept at rest — the accent
+     * colour only ever arrives as a hover cue, so a grid of cards reads as one
+     * calm surface until a single card is picked out of it.
+     */
     .card {
-        @apply rounded-lg border border-stone-200 bg-white shadow-soft transition-shadow duration-300;
-        @apply dark:border-stone-800 dark:bg-stone-900;
+        @apply rounded-xl border border-stone-200/70 bg-white shadow-soft transition-shadow duration-300;
+        @apply dark:border-stone-800/70 dark:bg-stone-900;
     }
 
     .card-hover {
@@ -299,8 +309,8 @@
     }
 
     .card-elevated {
-        @apply rounded-lg border border-stone-200 bg-white shadow-elevated;
-        @apply dark:border-stone-800 dark:bg-stone-900;
+        @apply rounded-xl border border-stone-200/70 bg-white shadow-elevated;
+        @apply dark:border-stone-800/70 dark:bg-stone-900;
     }
 
     /* Premium card — a warm sheen that fades in across the surface on hover */
@@ -346,10 +356,12 @@
         @apply dark:bg-stone-900/85 dark:text-stone-100;
     }
 
-    /* The card is its own hover target: lift it with an accent-tinted border */
+    /* The card is its own hover target: lift it, and let the accent trace the
+       edge it was picked out by. The tint stays low enough that neighbouring
+       cards in the same grid are never mistaken for the hovered one. */
     .card.group:hover {
         @apply shadow-elevated;
-        border-color: rgb(199 67 44 / 0.3);
+        border-color: rgb(199 67 44 / 0.35);
     }
 
     /* Decorative gradient bar + lift for feature tiles */
@@ -516,14 +528,126 @@
         @apply py-10 md:py-14 lg:py-16;
     }
 
-    /* Alternate section backgrounds for visual rhythm */
+    /*
+     * Alternate section surfaces, for the rhythm stacked sections need.
+     *
+     * This used to be rgb(250 250 249 / .5), which over a white page works out
+     * to #fdfdfc - a tint no eye can separate from the white beside it, so the
+     * alternate band the class promised never appeared and the comment above it
+     * described something nobody could see. It is now a full-strength warm
+     * neutral, one clear step below white, which is what makes consecutive
+     * sections read as separate bands instead of one unbroken column of page.
+     *
+     * The dark value stays on prefers-color-scheme because the theme itself
+     * does - darkMode is left unset in the Tailwind config, so 'media' is the
+     * default and a .dark-class rule would never fire.
+     */
     .section-alt {
-        background-color: rgb(250 250 249 / 0.5);
+        background-color: #f5f4f2;
     }
 
     @media (prefers-color-scheme: dark) {
         .section-alt {
-            background-color: rgb(12 10 9 / 0.3);
+            background-color: rgb(12 10 9 / 0.6);
+        }
+    }
+
+    /*
+     * Companion section surfaces.
+     *
+     * The homepage stacks seven consecutive `.section-alt` bands, which on a
+     * laptop reads as one endless grey column. These are the steps used to
+     * alternate against it - warm paper, a terracotta wash and plain white -
+     * so neighbouring sections separate as distinct bands. All three stay
+     * within a whisker of white, so every dark ink pair keeps its WCAG AA
+     * ratio (>= 13:1); this is purely a surface change.
+     *
+     * Dark mode mirrors `.section-alt` and sits behind `prefers-color-scheme`
+     * because darkMode is unset in the Tailwind config, so 'media' is the
+     * default and a `.dark` rule would never fire.
+     */
+    .section-cream {
+        /* Grid first so it paints on top of the paper gradient - a faint
+           48px drafting grid gives the band visible texture on a laptop
+           without any extra markup or request. */
+        background-image:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M0 0h48M0 0v48' fill='none' stroke='black' stroke-opacity='0.05'/%3E%3C/svg%3E"),
+            linear-gradient(180deg, #fbf9f6 0%, #f7f2ea 100%);
+    }
+
+    .section-tint {
+        /* Deep enough to read as a distinct terracotta band at 1280px+, yet
+           still 14.9:1 against ink and 4.6:1 against muted copy. */
+        background-image: linear-gradient(180deg, #fdf6f2 0%, #faebe1 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .section-cream {
+            background-image: linear-gradient(180deg, rgb(26 22 19 / 0.9) 0%, rgb(15 12 10 / 0.9) 100%);
+        }
+
+        .section-tint {
+            background-image: linear-gradient(180deg, rgb(46 26 20 / 0.55) 0%, rgb(18 13 11 / 0.6) 100%);
+        }
+    }
+
+    /*
+     * Desktop-only section chrome.
+     *
+     * Two drafting-sheet ornaments - registration corner marks and a datum
+     * rule - drawn purely with pseudo-elements, so they cost no markup and no
+     * requests. Both are `display: none` under 1024px: phones and tablets
+     * never download or lay them out, which keeps the mobile view as light as
+     * it is now. `position: relative` on the host only ever *contains* the
+     * existing absolutely-positioned children these sections already rely on.
+     */
+    .corner-marks,
+    .datum-rule {
+        position: relative;
+    }
+
+    .corner-marks::before,
+    .corner-marks::after,
+    .datum-rule::before {
+        display: none;
+        pointer-events: none;
+    }
+
+    @media (min-width: 1024px) {
+        .corner-marks::before,
+        .corner-marks::after {
+            content: '';
+            position: absolute;
+            display: block;
+            width: 3.5rem;
+            height: 3.5rem;
+            border: 1px solid rgb(196 66 43 / 0.38);
+        }
+
+        .corner-marks::before {
+            top: 1.5rem;
+            left: 1.5rem;
+            border-right: 0;
+            border-bottom: 0;
+        }
+
+        .corner-marks::after {
+            right: 1.5rem;
+            bottom: 1.5rem;
+            border-top: 0;
+            border-left: 0;
+        }
+
+        /* Datum line: the reference rule a drawing is measured from. */
+        .datum-rule::before {
+            content: '';
+            position: absolute;
+            display: block;
+            top: 0;
+            left: 1.5rem;
+            width: 5rem;
+            height: 3px;
+            background: linear-gradient(90deg, rgb(196 66 43) 0%, rgb(196 66 43 / 0.15) 100%);
         }
     }
 
@@ -683,6 +807,28 @@
         clip: rect(0, 0, 0, 0);
         white-space: nowrap;
         border: 0;
+    }
+
+    /* Expands a control's touch target beyond its painted box so small
+       controls (carousel dots, icon buttons) stay tappable on mobile without
+       changing the visual design. Vertical expansion is generous; horizontal
+       stays within half the gap between siblings so adjacent targets can
+       never overlap and steal each other's taps. */
+    .tap-expand {
+        position: relative;
+    }
+
+    .tap-expand::after {
+        content: '';
+        position: absolute;
+        top: -1rem;
+        bottom: -1rem;
+        /* -7px each side turns a 10px dot into a 24x42 hit box, which clears
+           WCAG 2.5.8 on its own. Kept under half the sibling gap (16px) so
+           adjacent hit boxes can never overlap. */
+        left: -7px;
+        right: -7px;
+        border-radius: inherit;
     }
 
     /* Focus trap for modals */

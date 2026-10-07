@@ -53,7 +53,7 @@
             <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-12">
                 @foreach($facts as $fact)
                     <div class="rounded-lg border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900">
-                        <dt class="text-overline text-stone-400 mb-1">{{ $fact['label'] }}</dt>
+                        <dt class="text-overline text-stone-500 mb-1">{{ $fact['label'] }}</dt>
                         <dd class="font-medium text-stone-900 dark:text-white">{{ $fact['value'] }}</dd>
                     </div>
                 @endforeach
@@ -85,7 +85,7 @@
                 <div class="grid gap-6 md:grid-cols-2">
                     @foreach($scopeSections as $section)
                         <div class="rounded-lg border border-stone-200 p-6 dark:border-stone-800">
-                            <h3 class="font-medium text-stone-900 dark:text-white mb-2">{{ $section['title'] }}</h3>
+                            <h3 class="font-medium text-heading-md text-stone-900 dark:text-white mb-2">{{ $section['title'] }}</h3>
                             <p class="text-body-sm text-stone-600 dark:text-stone-400">{{ $section['body'] }}</p>
                         </div>
                     @endforeach

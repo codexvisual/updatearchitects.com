@@ -52,14 +52,14 @@
                         <div class="space-y-4">
                             @foreach($offices as $office)
                                 <div>
-                                    <h3 class="font-medium text-stone-900 dark:text-white mb-1">{{ $office->name }}</h3>
+                                    <h3 class="font-medium text-heading-md text-stone-900 dark:text-white mb-1">{{ $office->name }}</h3>
                                     @if($office->phone)
-                                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $office->phone) }}" class="block text-body-sm text-accent-600 hover:text-accent-700">
+                                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $office->phone) }}" class="block py-1.5 text-body-sm text-accent-600 hover:text-accent-700">
                                             {{ $office->phone }}
                                         </a>
                                     @endif
                                     @if($office->email)
-                                        <a href="mailto:{{ $office->email }}" class="block text-body-sm text-stone-600 hover:text-accent-600 dark:text-stone-400 break-all">
+                                        <a href="mailto:{{ $office->email }}" class="block py-1.5 text-body-sm text-stone-600 hover:text-accent-600 dark:text-stone-400 break-all">
                                             {{ $office->email }}
                                         </a>
                                     @endif

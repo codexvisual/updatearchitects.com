@@ -5,13 +5,18 @@
 ])
 
 @php
-    $sizes = [
-        'sm' => 'h-10 w-10 text-sm',
-        'md' => 'h-16 w-16 text-lg',
-        'lg' => 'h-24 w-24 text-2xl',
-        'xl' => 'h-32 w-32 text-3xl',
+    // px is the rendered square: it becomes width/height so the circle can be
+    // laid out before the photograph arrives, and sizes so the browser knows
+    // how many pixels of it actually need downloading.
+    $metrics = [
+        'sm' => ['class' => 'h-10 w-10 text-sm', 'px' => 40],
+        'md' => ['class' => 'h-16 w-16 text-lg', 'px' => 64],
+        'lg' => ['class' => 'h-24 w-24 text-2xl', 'px' => 96],
+        'xl' => ['class' => 'h-32 w-32 text-3xl', 'px' => 128],
     ];
-    $sizeClass = $sizes[$size] ?? $sizes['md'];
+    $metric = $metrics[$size] ?? $metrics['md'];
+    $sizeClass = $metric['class'];
+    $sizePx = $metric['px'];
 
     // Deterministic palette pick from name so the same person always gets the same colour.
     $palette = [
@@ -46,11 +51,22 @@
 @endphp
 
 @if($photo)
+    @php
+        // Avatars are never displayed beyond 128px, so anything wider than the
+        // 480px thumbnail is a download the browser should not be offered
+        // unless it is genuinely short of candidates.
+        $src = $photo->getAvailableUrl(['thumbnail', 'medium']);
+        $srcset = $photo->responsiveSrcset(['thumbnail', 'medium']);
+    @endphp
     <img
-        src="{{ $photo->getAvailableUrl(['thumbnail']) }}"
+        src="{{ $src }}"
+        @if($srcset) srcset="{{ $srcset }}" sizes="{{ $sizePx }}px" @endif
+        width="{{ $sizePx }}"
+        height="{{ $sizePx }}"
         alt="{{ $name }}"
         {{ $attributes->merge(['class' => "rounded-full object-cover shrink-0 ring-2 ring-accent-200 dark:ring-accent-900 $sizeClass"]) }}
         loading="lazy"
+        decoding="async"
     >
 @else
     <span

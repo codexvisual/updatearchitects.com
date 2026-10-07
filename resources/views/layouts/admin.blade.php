@@ -30,7 +30,7 @@
                 </span>
                 <span class="min-w-0">
                     <span class="block text-sm font-semibold text-white truncate">{{ config('app.name') }}</span>
-                    <span class="block text-caption uppercase tracking-wider text-stone-500">Admin</span>
+                    <span class="block text-caption uppercase tracking-wider text-stone-400">Admin</span>
                 </span>
                 <button
                     type="button"
@@ -91,7 +91,7 @@
 
                 @foreach($navigation as $group)
                     <div>
-                        <p class="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-stone-500">{{ $group['label'] }}</p>
+                        <p class="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-stone-400">{{ $group['label'] }}</p>
                         <ul class="space-y-0.5">
                             @foreach($group['items'] as $item)
                                 @php $isActive = request()->routeIs($item['route']); @endphp
@@ -116,7 +116,7 @@
 
                 @can('viewAny', App\Models\User::class)
                     <div>
-                        <p class="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-stone-500">Access</p>
+                        <p class="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-stone-400">Access</p>
                         <ul class="space-y-0.5">
                             <li>
                                 <a href="{{ route('admin.users.index') }}" @class([

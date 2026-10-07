@@ -31,7 +31,7 @@
                 <div class="grid gap-6 md:grid-cols-3">
                     @foreach($relatedPosts as $related)
                         <a href="{{ route('blog.show', $related->slug) }}" class="group">
-                            <h3 class="font-medium group-hover:text-accent-600 transition-colors">{{ $related->title }}</h3>
+                            <h3 class="font-medium text-heading-md group-hover:text-accent-600 transition-colors">{{ $related->title }}</h3>
                             <p class="text-caption text-stone-500">{{ $related->published_at?->format('M d, Y') }}</p>
                         </a>
                     @endforeach

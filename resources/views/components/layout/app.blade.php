@@ -135,7 +135,7 @@
         x-show="visible"
         x-transition.opacity.duration.300ms
         @click="window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })"
-        class="fixed bottom-24 right-6 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full bg-stone-900 text-white shadow-elevated transition-colors hover:bg-accent-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-white dark:text-stone-900 dark:hover:bg-accent-500"
+        class="fixed bottom-[4.75rem] right-4 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full bg-stone-900 text-white shadow-elevated transition-colors hover:bg-accent-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-white dark:text-stone-900 dark:hover:bg-accent-500 sm:bottom-24 sm:right-6 sm:h-12 sm:w-12"
         aria-label="Back to top"
     >
         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">

@@ -87,8 +87,15 @@
             {{-- Brand --}}
             <div class="lg:col-span-4">
                 <a href="{{ route('home') }}" class="group mb-5 flex items-center gap-2.5" aria-label="{{ config('app.name') }} - Home">
-                    <span class="inline-flex items-center justify-center rounded-lg bg-white p-1 shadow-soft">
-                        <img src="{{ asset('logo.jpg') }}" alt="{{ config('app.name') }} logo" class="h-9 w-auto" width="562" height="435" loading="lazy">
+                    {{--
+                        Cropped mark, not logo.jpg: the full 562px lockup (mark +
+                        UPDATE + ARCHITECTS & ENGINEERING) at h-9 collapses to ~46px
+                        wide, so its wordmark is unreadable smudge beside the live
+                        "Update Architects" text below it. The mark carries the
+                        identity; the text beside it stays sharp at any size.
+                    --}}
+                    <span class="inline-flex shrink-0 items-center justify-center rounded-lg bg-white p-1.5 shadow-soft">
+                        <img src="{{ asset('logo-mark.jpg') }}" alt="" class="h-7 w-auto" width="360" height="186" loading="lazy" decoding="async">
                     </span>
                     <span class="font-display text-heading-md font-medium tracking-tight text-white">Update Architects</span>
                 </a>
@@ -107,7 +114,7 @@
                             href="https://web.facebook.com/UpdateArchitects"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-800 text-stone-400 transition-colors hover:border-accent-600 hover:bg-stone-900 hover:text-accent-400"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-stone-800 text-stone-400 transition-colors hover:border-accent-600 hover:bg-stone-900 hover:text-accent-400"
                             aria-label="Facebook (opens in a new tab)"
                             title="Facebook"
                         >
@@ -119,7 +126,7 @@
                     <li>
                         <a
                             href="mailto:updatearchites120@gmail.com"
-                            class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-800 text-stone-400 transition-colors hover:border-accent-600 hover:bg-stone-900 hover:text-accent-400"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-stone-800 text-stone-400 transition-colors hover:border-accent-600 hover:bg-stone-900 hover:text-accent-400"
                             aria-label="Email (opens in your mail app)"
                             title="Email"
                         >
@@ -133,7 +140,7 @@
                             href="https://wa.me/8801751585650"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-800 text-stone-400 transition-colors hover:border-accent-600 hover:bg-stone-900 hover:text-accent-400"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-stone-800 text-stone-400 transition-colors hover:border-accent-600 hover:bg-stone-900 hover:text-accent-400"
                             aria-label="WhatsApp (opens in a new tab)"
                             title="WhatsApp"
                         >
@@ -147,11 +154,11 @@
 
             {{-- Company --}}
             <nav class="lg:col-span-2" aria-label="Quick links">
-                <h2 class="text-overline text-stone-500 mb-4">Company</h2>
+                <h2 class="text-overline text-stone-400 mb-4">Company</h2>
                 <ul class="space-y-2.5">
                     @foreach($footerLinks as $item)
                         <li>
-                            <a href="{{ $item->url }}" class="text-body-sm text-stone-400 transition-colors hover:text-accent-400">
+                            <a href="{{ $item->url }}" class="inline-block py-1.5 text-body-sm text-stone-400 transition-colors hover:text-accent-400">
                                 {{ $item->title }}
                             </a>
                         </li>
@@ -162,12 +169,12 @@
             {{-- Services --}}
             @if($serviceCategories->isNotEmpty())
                 <nav class="lg:col-span-3" aria-label="Services">
-                    <h2 class="text-overline text-stone-500 mb-4">Services</h2>
+                    <h2 class="text-overline text-stone-400 mb-4">Services</h2>
                     <ul class="space-y-2.5">
                         @foreach($serviceCategories as $category)
                             <li>
                                 @if(Route::has("services.{$category->slug}"))
-                                    <a href="{{ route("services.{$category->slug}") }}" class="text-body-sm text-stone-400 transition-colors hover:text-accent-400">
+                                    <a href="{{ route("services.{$category->slug}") }}" class="inline-block py-1.5 text-body-sm text-stone-400 transition-colors hover:text-accent-400">
                                         {{ $category->name }}
                                     </a>
                                 @else
@@ -186,7 +193,7 @@
 
             {{-- Offices --}}
             <address class="not-italic lg:col-span-3" aria-label="Office locations">
-                <h2 class="text-overline text-stone-500 mb-4">Offices</h2>
+                <h2 class="text-overline text-stone-400 mb-4">Offices</h2>
 
                 <ul class="space-y-4">
                     @forelse($offices as $office)
@@ -199,31 +206,31 @@
 
                             @if($showOfficeContact)
                                 @if($office->phone)
-                                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $office->phone) }}" class="mt-1 block text-body-sm text-stone-400 transition-colors hover:text-accent-400">
+                                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $office->phone) }}" class="mt-1 block py-2.5 text-body-sm text-stone-400 transition-colors hover:text-accent-400">
                                         {{ $office->phone }}
                                     </a>
                                 @endif
                                 @if($office->email)
-                                    <a href="mailto:{{ $office->email }}" class="mt-1 block break-all text-body-sm text-stone-400 transition-colors hover:text-accent-400">
+                                    <a href="mailto:{{ $office->email }}" class="mt-1 block break-all py-2.5 text-body-sm text-stone-400 transition-colors hover:text-accent-400">
                                         {{ $office->email }}
                                     </a>
                                 @endif
                             @endif
                         </li>
                     @empty
-                        <li class="text-body-sm text-stone-500">Office details will be published here shortly.</li>
+                        <li class="text-body-sm text-stone-400">Office details will be published here shortly.</li>
                     @endforelse
                 </ul>
 
                 @if($sharedPhone || $sharedEmail)
                     <div class="mt-5 space-y-1.5 border-t border-stone-800 pt-4">
                         @if($sharedPhone)
-                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $sharedPhone) }}" class="block text-body-sm text-stone-400 transition-colors hover:text-accent-400">
+                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $sharedPhone) }}" class="block py-2.5 text-body-sm text-stone-400 transition-colors hover:text-accent-400">
                                 {{ $sharedPhone }}
                             </a>
                         @endif
                         @if($sharedEmail)
-                            <a href="mailto:{{ $sharedEmail }}" class="block break-all text-body-sm text-stone-400 transition-colors hover:text-accent-400">
+                            <a href="mailto:{{ $sharedEmail }}" class="block break-all py-2.5 text-body-sm text-stone-400 transition-colors hover:text-accent-400">
                                 {{ $sharedEmail }}
                             </a>
                         @endif
@@ -235,7 +242,7 @@
         {{-- Bottom bar --}}
         <div class="mt-12 flex flex-col gap-4 border-t border-stone-800 pt-6 md:flex-row md:items-center md:justify-between">
             <div class="space-y-1.5">
-                <p class="text-body-sm text-stone-500">
+                <p class="text-body-sm text-stone-400">
                     &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
                 </p>
 
@@ -256,10 +263,10 @@
             </div>
 
             <nav aria-label="Legal" class="flex flex-wrap gap-x-6 gap-y-2">
-                <a href="{{ route('privacy') }}" class="text-body-sm text-stone-400 transition-colors hover:text-accent-400">Privacy Policy</a>
-                <a href="{{ route('terms') }}" class="text-body-sm text-stone-400 transition-colors hover:text-accent-400">Terms &amp; Conditions</a>
-                <a href="{{ route('international-sop') }}" class="text-body-sm text-stone-400 transition-colors hover:text-accent-400">International SOP</a>
-                <a href="{{ route('sitemap') }}" class="text-body-sm text-stone-400 transition-colors hover:text-accent-400">Sitemap</a>
+                <a href="{{ route('privacy') }}" class="inline-block py-1.5 text-body-sm text-stone-400 transition-colors hover:text-accent-400">Privacy Policy</a>
+                <a href="{{ route('terms') }}" class="inline-block py-1.5 text-body-sm text-stone-400 transition-colors hover:text-accent-400">Terms &amp; Conditions</a>
+                <a href="{{ route('international-sop') }}" class="inline-block py-1.5 text-body-sm text-stone-400 transition-colors hover:text-accent-400">International SOP</a>
+                <a href="{{ route('sitemap') }}" class="inline-block py-1.5 text-body-sm text-stone-400 transition-colors hover:text-accent-400">Sitemap</a>
             </nav>
         </div>
     </div>

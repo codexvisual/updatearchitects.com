@@ -48,7 +48,7 @@
                             <div>{{ $member->qualification }}</div>
                         @endif
                         @if($member->registration)
-                            <div class="text-stone-500 dark:text-stone-500">{{ $member->registration }}</div>
+                            <div class="text-stone-500 dark:text-stone-400">{{ $member->registration }}</div>
                         @endif
                     </dl>
                 </x-ui.card>

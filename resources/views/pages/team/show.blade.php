@@ -77,7 +77,7 @@
                                     @else
                                         <x-ui.placeholder ratio="video" icon="photo" class="mb-3" />
                                     @endif
-                                    <h3 class="font-medium text-stone-900 dark:text-white group-hover:text-accent-600 transition-colors">{{ $project->title }}</h3>
+                                    <h3 class="font-medium text-heading-md text-stone-900 dark:text-white group-hover:text-accent-600 transition-colors">{{ $project->title }}</h3>
                                     @if($project->location)
                                         <p class="text-body-sm text-stone-500 dark:text-stone-400 mt-1">{{ $project->location }}</p>
                                     @endif
@@ -93,7 +93,7 @@
                     <dl class="rounded-xl border border-stone-200 p-6 dark:border-stone-800 space-y-4">
                         @foreach($facts as $fact)
                             <div>
-                                <dt class="text-overline text-stone-400 mb-1">{{ $fact['label'] }}</dt>
+                                <dt class="text-overline text-stone-500 mb-1">{{ $fact['label'] }}</dt>
                                 <dd class="text-body-sm text-stone-900 dark:text-white">{{ $fact['value'] }}</dd>
                             </div>
                         @endforeach

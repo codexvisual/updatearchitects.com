@@ -64,7 +64,7 @@
 
                                     <div class="flex flex-1 flex-col p-6">
                                         @if($post->published_at)
-                                            <p class="text-caption text-stone-400 dark:text-stone-500 mb-2">{{ $post->published_at->format('M d, Y') }}</p>
+                                            <p class="text-caption text-stone-500 dark:text-stone-400 mb-2">{{ $post->published_at->format('M d, Y') }}</p>
                                         @endif
 
                                         <h2 class="font-display text-heading-lg mb-2 group-hover:text-accent-600 transition-colors">{{ $post->title }}</h2>
@@ -102,7 +102,7 @@
                                 'text-stone-600 hover:bg-stone-50 dark:text-stone-400 dark:hover:bg-stone-800' => request('category'),
                             ])>
                                 <span>All articles</span>
-                                <span class="text-stone-400">{{ $posts->total() }}</span>
+                                <span class="text-stone-500">{{ $posts->total() }}</span>
                             </a>
                         </li>
                         @foreach($categories as $category)
@@ -113,7 +113,7 @@
                                     'text-stone-600 hover:bg-stone-50 dark:text-stone-400 dark:hover:bg-stone-800' => request('category') !== $category->slug,
                                 ])>
                                     <span>{{ $category->name }}</span>
-                                    <span class="text-stone-400">{{ $category->posts_count }}</span>
+                                    <span class="text-stone-500">{{ $category->posts_count }}</span>
                                 </a>
                             </li>
                         @endforeach

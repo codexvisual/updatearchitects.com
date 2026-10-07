@@ -49,9 +49,16 @@
 >
     <div class="flex h-16 md:h-20 items-center justify-between gap-4">
         {{-- Logo --}}
-        <a href="{{ route('home') }}" class="flex items-center gap-2.5 shrink-0 group" aria-label="{{ config('app.name') }} - Home">
-            <span class="inline-flex items-center justify-center rounded-lg bg-white p-1 shadow-soft">
-                <img src="{{ asset('logo.jpg') }}" alt="{{ config('app.name') }} logo" class="h-8 md:h-9 w-auto" width="562" height="435" loading="eager">
+        <a href="{{ route('home') }}" class="flex items-center gap-2.5 shrink-0 group py-1" aria-label="{{ config('app.name') }} - Home">
+            {{--
+                The full lockup (roof mark + UPDATE + ARCHITECTS & ENGINEERING) is
+                illegible at header height: at h-8 the whole 562px-wide artwork is
+                squeezed to ~41px, so the wordmark reads as a smudge. This cropped
+                mark carries the identity, and the wordmark beside it stays live text
+                — sharp at every size, and it wraps to "UA&E" on small screens.
+            --}}
+            <span class="inline-flex shrink-0 items-center justify-center rounded-lg bg-white p-1.5 shadow-soft">
+                <img src="{{ asset('logo-mark.jpg') }}" alt="" class="h-6 w-auto md:h-7" width="360" height="186" loading="eager" decoding="async">
             </span>
             <span class="flex flex-col leading-tight">
                 <span class="font-display text-heading-sm font-medium tracking-tight text-stone-900 dark:text-white hidden sm:block">
@@ -60,7 +67,7 @@
                 <span class="font-display text-heading-sm font-medium tracking-tight text-stone-900 dark:text-white sm:hidden">
                     UA&amp;E
                 </span>
-                <span class="text-[11px] uppercase tracking-[0.18em] text-stone-400 hidden sm:block">Engineering</span>
+                <span class="text-[11px] uppercase tracking-[0.18em] text-stone-500 hidden sm:block">Engineering</span>
             </span>
         </a>
 

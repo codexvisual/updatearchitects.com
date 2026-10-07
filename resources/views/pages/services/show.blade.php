@@ -83,7 +83,7 @@
                             @else
                                 <x-ui.placeholder ratio="video" icon="photo" class="mb-3" />
                             @endif
-                            <h3 class="font-medium text-stone-900 dark:text-white group-hover:text-accent-600 transition-colors">{{ $project->title }}</h3>
+                            <h3 class="font-medium text-heading-md text-stone-900 dark:text-white group-hover:text-accent-600 transition-colors">{{ $project->title }}</h3>
                             @if($project->location)
                                 <p class="text-body-sm text-stone-500 dark:text-stone-400 mt-1">{{ $project->location }}</p>
                             @endif
@@ -101,7 +101,7 @@
                         <a href="{{ route('team.show', $member->slug) }}" class="inline-flex items-center gap-2 rounded-full border border-stone-200 px-4 py-2 text-body-sm text-stone-700 hover:border-accent-400 dark:border-stone-700 dark:text-stone-200">
                             {{ $member->name }}
                             @if($member->pivot->role ?? null)
-                                <span class="text-stone-400">· {{ $member->pivot->role }}</span>
+                                <span class="text-stone-500">· {{ $member->pivot->role }}</span>
                             @endif
                         </a>
                     @endforeach

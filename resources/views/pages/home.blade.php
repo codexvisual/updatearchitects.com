@@ -143,14 +143,17 @@
             </button>
 
             {{-- Pagination dots --}}
-            <div class="absolute inset-x-0 bottom-8 z-20 flex items-center justify-center gap-2.5">
+            {{-- gap-4 (was gap-2.5) keeps dot centres >= 24px apart so the small
+                 dots satisfy WCAG 2.5.8's spacing rule and never overlap each
+                 other's `.tap-expand` hit areas. --}}
+            <div class="absolute inset-x-0 bottom-8 z-20 flex items-center justify-center gap-4">
                 @for($i = 0; $i < $heroSlides; $i++)
                     <button
                         type="button"
                         @click="go({{ $i }})"
                         :aria-current="index === {{ $i }} ? 'true' : 'false'"
                         aria-label="Go to slide {{ $i + 1 }}"
-                        class="h-2.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                        class="tap-expand h-2.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                         :class="index === {{ $i }} ? 'w-8 bg-accent-500' : 'w-2.5 bg-white/40 hover:bg-white/70'"
                     ></button>
                 @endfor
@@ -162,7 +165,7 @@
     </section>
 
     {{-- Company Introduction --}}
-    <section class="section section-alt" aria-labelledby="intro-heading">
+    <section class="section section-cream corner-marks" aria-labelledby="intro-heading">
         <div class="container">
             <div class="grid md:grid-cols-2 gap-12 items-center">
                 <div>
@@ -186,7 +189,7 @@
                     @endphp
                     @foreach($introFeatures as $feature)
                         <div class="text-center p-6 bg-stone-50 rounded-xl border border-stone-200 dark:bg-stone-900 dark:border-stone-800 feature-tile min-w-0">
-                            <h3 class="font-medium text-stone-900 dark:text-white mb-2 break-words">{{ $feature['title'] }}</h3>
+                            <h3 class="font-medium text-heading-md text-stone-900 dark:text-white mb-2 break-words">{{ $feature['title'] }}</h3>
                             <p class="text-body-sm text-stone-600 dark:text-stone-400 break-words">{{ $feature['text'] }}</p>
                         </div>
                     @endforeach
@@ -197,7 +200,7 @@
 
     {{-- Featured Project --}}
     @if($featuredProject)
-        <section class="section bg-stone-50 dark:bg-stone-900/50" aria-labelledby="featured-heading">
+        <section class="section section-alt" aria-labelledby="featured-heading">
             <div class="container">
                 <div class="grid md:grid-cols-2 gap-12 items-center">
                     <div class="order-2 md:order-1">
@@ -252,7 +255,7 @@
     @endif
 
     {{-- Core Services --}}
-    <section class="section bg-accent-50/50 dark:bg-stone-950/20" aria-labelledby="services-heading">
+    <section class="section section-tint datum-rule" aria-labelledby="services-heading">
         <div class="container">
             <div class="text-center max-w-3xl mx-auto mb-16">
                 <p class="text-overline text-accent-600 mb-4">Our Services</p>
@@ -313,7 +316,7 @@
                                 <x-ui.placeholder ratio="video" icon="photo" class="bg-stone-800" />
                             @endif
                         </div>
-                        <h3 class="font-medium text-white mb-1 group-hover:text-accent-400 transition-colors">{{ $project->title }}</h3>
+                        <h3 class="font-medium text-heading-md text-white mb-1 group-hover:text-accent-400 transition-colors">{{ $project->title }}</h3>
                         <p class="text-body-sm text-stone-400">
                             {{ collect([$project->location, Str::headline((string) $project->category)])->filter()->join(' • ') }}
                         </p>
@@ -339,7 +342,7 @@
     @endphp
 
     @if($interiorService)
-        <section class="section section-alt" aria-labelledby="interior-heading">
+        <section class="section section-tint datum-rule" aria-labelledby="interior-heading">
             <div class="container">
                 <div class="grid md:grid-cols-2 gap-12 items-center">
                     <div>
@@ -368,7 +371,7 @@
     @endif
 
     {{-- Team Preview --}}
-    <section class="section bg-stone-50 dark:bg-stone-900/50" aria-labelledby="team-heading">
+    <section class="section section-cream" aria-labelledby="team-heading">
         <div class="container">
             <div class="text-center mb-16">
                 <p class="text-overline text-accent-600 mb-4">Our Team</p>
@@ -405,7 +408,7 @@
     </section>
 
     {{-- Latest Insights --}}
-    <section class="section bg-stone-50 dark:bg-stone-900/50" aria-labelledby="insights-heading">
+    <section class="section section-alt" aria-labelledby="insights-heading">
         <div class="container">
             <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-16">
                 <div>
@@ -417,7 +420,25 @@
 
             <div class="grid-auto-fit-3 gap-8">
                 @forelse($latestPosts as $post)
-                    <x-ui.card variant="premium" href="{{ route('blog.show', $post->slug) }}" class="group p-8 flex flex-col h-full animate-fade-in-up" style="animation-delay: {{ ($loop->index % 3) * 100 }}ms">
+                    <x-ui.card variant="premium" href="{{ route('blog.show', $post->slug) }}" class="group p-8 flex flex-col h-full overflow-hidden animate-fade-in-up" style="animation-delay: {{ ($loop->index % 3) * 100 }}ms">
+                        {{--
+                            These cards previously carried no imagery, so a post without a
+                            featured image rendered as a bare block of text. This mirrors
+                            the /insights index: use the featured image when there is one
+                            and fall back to the icon placeholder otherwise, so every card
+                            has a visual header. The negative margins bleed it past p-8;
+                            overflow-hidden on the card keeps the corners square.
+                        --}}
+                        <div class="card-media relative -mx-8 -mt-8 mb-6">
+                            @if($post->featuredImage)
+                                <img src="{{ $post->featuredImage->getAvailableUrl(['large']) }}" srcset="{{ $post->featuredImage->responsiveSrcset() }}" sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" alt="{{ $post->title }}" class="w-full aspect-video object-cover" loading="lazy" width="640" height="360">
+                            @else
+                                <div class="w-full aspect-video">
+                                    <x-ui.placeholder ratio="video" icon="photo" class="h-full !rounded-none" />
+                                </div>
+                            @endif
+                        </div>
+
                         <div class="mb-4 flex items-center gap-3">
                             @if($post->category)
                                 <span class="inline-flex items-center rounded-full bg-accent-50 px-3 py-1 text-caption font-medium text-accent-700 dark:bg-accent-900/30 dark:text-accent-300">
@@ -445,7 +466,7 @@
     </section>
 
     {{-- Why Choose Us --}}
-    <section class="section section-alt" aria-labelledby="why-heading">
+    <section class="section section-tint datum-rule" aria-labelledby="why-heading">
         <div class="container">
             <div class="text-center max-w-3xl mx-auto mb-16">
                 <h2 id="why-heading" class="font-display text-display-md mb-6">Why Choose Update Architects</h2>
@@ -454,22 +475,27 @@
 
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @php
+                    // Real project renders from this firm's own library, served
+                    // locally: the Unsplash originals were hotlinked from a third
+                    // party, repeated across slots, and carried no srcset. These
+                    // are pre-cropped to the card's box at 800x360 so the browser
+                    // never downloads a 1.2 MB source for a 160px strip.
                     $differentiators = [
-                        ['title' => 'Integrated Approach', 'text' => Setting::getValue('why.integrated_approach', $locale, 'Seamless coordination between architecture, engineering, and construction teams.'), 'image' => 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80'],
-                        ['title' => 'Quality Assurance', 'text' => Setting::getValue('why.quality', $locale, 'Quality control at every stage of design and construction.'), 'image' => 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80'],
-                        ['title' => 'Local Expertise', 'text' => Setting::getValue('why.local', $locale, 'Practical understanding of Bangladesh building practice and approvals.'), 'image' => 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600&q=80'],
-                        ['title' => 'Innovation', 'text' => Setting::getValue('why.innovation', $locale, 'Modern design principles paired with proven engineering solutions.'), 'image' => 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=600&q=80'],
-                        ['title' => 'Client Partnership', 'text' => Setting::getValue('why.partnership', $locale, 'We treat your project as if it were our own.'), 'image' => 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80'],
-                        ['title' => 'Transparency', 'text' => Setting::getValue('why.transparency', $locale, 'Clear communication and honest progress reporting.'), 'image' => 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80'],
+                        ['title' => 'Integrated Approach', 'text' => Setting::getValue('why.integrated_approach', $locale, 'Seamless coordination between architecture, engineering, and construction teams.'), 'image' => 'images/optimized/why-01.jpg'],
+                        ['title' => 'Quality Assurance', 'text' => Setting::getValue('why.quality', $locale, 'Quality control at every stage of design and construction.'), 'image' => 'images/optimized/why-02.jpg'],
+                        ['title' => 'Local Expertise', 'text' => Setting::getValue('why.local', $locale, 'Practical understanding of Bangladesh building practice and approvals.'), 'image' => 'images/optimized/why-03.jpg'],
+                        ['title' => 'Innovation', 'text' => Setting::getValue('why.innovation', $locale, 'Modern design principles paired with proven engineering solutions.'), 'image' => 'images/optimized/why-04.jpg'],
+                        ['title' => 'Client Partnership', 'text' => Setting::getValue('why.partnership', $locale, 'We treat your project as if it were our own.'), 'image' => 'images/optimized/why-05.jpg'],
+                        ['title' => 'Transparency', 'text' => Setting::getValue('why.transparency', $locale, 'Clear communication and honest progress reporting.'), 'image' => 'images/optimized/why-06.jpg'],
                     ];
                 @endphp
                 @foreach($differentiators as $item)
                     <div class="group relative rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:shadow-card hover:-translate-y-1 transition-all duration-300">
                         <div class="h-40 overflow-hidden">
-                            <img src="{{ $item['image'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" width="600" height="400">
+                            <img src="{{ asset($item['image']) }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" decoding="async" width="800" height="360">
                         </div>
                         <div class="p-6">
-                            <h3 class="font-medium text-stone-900 dark:text-white mb-3 break-words">{{ $item['title'] }}</h3>
+                            <h3 class="font-medium text-heading-md text-stone-900 dark:text-white mb-3 break-words">{{ $item['title'] }}</h3>
                             <p class="text-body-sm text-stone-600 dark:text-stone-400 break-words">{{ $item['text'] }}</p>
                         </div>
                     </div>
@@ -479,7 +505,7 @@
     </section>
 
     {{-- Process --}}
-    <section class="section bg-stone-50 dark:bg-stone-900/50" aria-labelledby="process-heading">
+    <section class="section section-cream corner-marks" aria-labelledby="process-heading">
         <div class="container">
             <div class="text-center mb-16">
                 <h2 id="process-heading" class="font-display text-display-md mb-4">Our Design & Construction Process</h2>
@@ -488,27 +514,30 @@
 
             <ol class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 @php
+                    // Own renders again - see the "Why Choose Us" block above.
+                    // process-01/02 are the firm's own site plan and floor plan,
+                    // which is what survey and concept design actually produce.
                     $process = [
-                        ['step' => '01', 'title' => 'Site Survey', 'text' => 'Comprehensive site analysis and assessment.', 'image' => 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&q=80'],
-                        ['step' => '02', 'title' => 'Concept Design', 'text' => 'Preliminary design ideas and client consultation.', 'image' => 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=400&q=80'],
-                        ['step' => '03', 'title' => 'Architectural Design', 'text' => 'Detailed architectural drawings and documentation.', 'image' => 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400&q=80'],
-                        ['step' => '04', 'title' => 'Structural Design', 'text' => 'Engineering calculations and structural plans.', 'image' => 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400&q=80'],
-                        ['step' => '05', 'title' => 'Foundation', 'text' => 'Site preparation and foundation work.', 'image' => 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=80'],
-                        ['step' => '06', 'title' => 'Base Casting', 'text' => 'Ground floor structural slab casting.', 'image' => 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400&q=80'],
-                        ['step' => '07', 'title' => 'Construction', 'text' => 'Columns, slabs, and finishing work.', 'image' => 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400&q=80'],
-                        ['step' => '08', 'title' => 'Handover', 'text' => 'Final inspection and project delivery.', 'image' => 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&q=80'],
+                        ['step' => '01', 'title' => 'Site Survey', 'text' => 'Comprehensive site analysis and assessment.', 'image' => 'images/optimized/process-01.jpg'],
+                        ['step' => '02', 'title' => 'Concept Design', 'text' => 'Preliminary design ideas and client consultation.', 'image' => 'images/optimized/process-02.jpg'],
+                        ['step' => '03', 'title' => 'Architectural Design', 'text' => 'Detailed architectural drawings and documentation.', 'image' => 'images/optimized/process-03.jpg'],
+                        ['step' => '04', 'title' => 'Structural Design', 'text' => 'Engineering calculations and structural plans.', 'image' => 'images/optimized/process-04.jpg'],
+                        ['step' => '05', 'title' => 'Foundation', 'text' => 'Site preparation and foundation work.', 'image' => 'images/optimized/process-05.jpg'],
+                        ['step' => '06', 'title' => 'Base Casting', 'text' => 'Ground floor structural slab casting.', 'image' => 'images/optimized/process-06.jpg'],
+                        ['step' => '07', 'title' => 'Construction', 'text' => 'Columns, slabs, and finishing work.', 'image' => 'images/optimized/process-07.jpg'],
+                        ['step' => '08', 'title' => 'Handover', 'text' => 'Final inspection and project delivery.', 'image' => 'images/optimized/process-08.jpg'],
                     ];
                 @endphp
                 @foreach($process as $step)
                     <li class="group relative rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:shadow-card hover:-translate-y-1 transition-all duration-300">
                         <div class="h-32 overflow-hidden">
-                            <img src="{{ $step['image'] }}" alt="{{ $step['title'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" width="400" height="200">
+                            <img src="{{ asset($step['image']) }}" alt="{{ $step['title'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" decoding="async" width="800" height="360">
                         </div>
                         <div class="p-5 relative">
                             <div class="absolute -top-5 right-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent-600 text-white text-body-sm font-medium shadow-elevated group-hover:scale-110 transition-transform duration-300">
                                 {{ $step['step'] }}
                             </div>
-                            <h3 class="font-medium text-stone-900 dark:text-white mb-2 break-words">{{ $step['title'] }}</h3>
+                            <h3 class="font-medium text-heading-md text-stone-900 dark:text-white mb-2 break-words">{{ $step['title'] }}</h3>
                             <p class="text-body-sm text-stone-600 dark:text-stone-400 break-words">{{ $step['text'] }}</p>
                         </div>
                     </li>
@@ -558,17 +587,17 @@
                                 </svg>
                             </div>
 
-                            <h3 class="font-medium text-stone-900 dark:text-white mb-4">{{ $office->name }}</h3>
+                            <h3 class="font-medium text-heading-md text-stone-900 dark:text-white mb-4">{{ $office->name }}</h3>
 
                             <address class="not-italic space-y-3 text-body-sm text-stone-600 dark:text-stone-400">
                                 @if($office->address)
                                     <p>{!! nl2br(e($office->address)) !!}</p>
                                 @endif
                                 @if($office->phone)
-                                    <p><a href="tel:{{ preg_replace('/[^0-9+]/', '', $office->phone) }}" class="hover:text-accent-600">{{ $office->phone }}</a></p>
+                                    <p><a href="tel:{{ preg_replace('/[^0-9+]/', '', $office->phone) }}" class="inline-block py-1.5 hover:text-accent-600">{{ $office->phone }}</a></p>
                                 @endif
                                 @if($office->email)
-                                    <p><a href="mailto:{{ $office->email }}" class="hover:text-accent-600 break-all">{{ $office->email }}</a></p>
+                                    <p><a href="mailto:{{ $office->email }}" class="inline-block py-1.5 hover:text-accent-600 break-all">{{ $office->email }}</a></p>
                                 @endif
                             </address>
                         </x-ui.card>

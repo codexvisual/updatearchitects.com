@@ -22,7 +22,9 @@ export default {
                     200: '#e7e5e4',
                     300: '#d6d3d1',
                     400: '#a8a29e',
-                    500: '#78716c',
+                    // Darkened from #78716c so 14-16px muted copy clears WCAG AA
+                    // (4.88:1) on the tinted `.section-alt` band, not just on white.
+                    500: '#6f6a63',
                     600: '#57534e',
                     700: '#44403c',
                     800: '#292524',
@@ -50,7 +52,11 @@ export default {
                     300: '#eda293',
                     400: '#e3745c',
                     500: '#d9573a',
-                    600: '#c7432c',
+                    // #c7432c scored 4.477:1 on the tinted `.section-alt` band -
+                    // just under the 4.5 AA floor for the 12px overline labels.
+                    // #c4422b is visually identical but clears it (4.56:1) and
+                    // lifts white-on-accent buttons from 4.92 to 5.01.
+                    600: '#c4422b',
                     700: '#a03224',
                     800: '#812c22',
                     900: '#692820',
@@ -72,7 +78,13 @@ export default {
                     foreground: 'var(--color-muted-foreground)',
                 },
                 border: 'var(--color-border)',
-                ring: 'var(--color-ring)',
+                // `--color-ring` stores bare HSL components ("20 15% 25%") so raw CSS
+                // can wrap them with hsl(). Tailwind's ring-* utilities paste the value
+                // verbatim, which is not a colour: the ring's box-shadow then fails to
+                // parse, and because .input:focus also sets border-color:transparent,
+                // every focused field lost its indicator entirely. Wrapping here keeps
+                // the .dark override working (custom props substitute at use time).
+                ring: { DEFAULT: 'hsl(var(--color-ring))' },
             },
 
             fontFamily: {

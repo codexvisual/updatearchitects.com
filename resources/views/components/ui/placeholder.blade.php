@@ -24,22 +24,22 @@
 
     <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
         @if($icon === 'building')
-            <svg class="h-8 w-8 text-stone-400 dark:text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
+            <svg class="h-8 w-8 text-stone-500 dark:text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
                 <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4M9 10h.01M15 10h.01M9 13h.01M15 13h.01M9 16h.01M15 16h.01" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         @elseif($icon === 'photo')
-            <svg class="h-8 w-8 text-stone-400 dark:text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
+            <svg class="h-8 w-8 text-stone-500 dark:text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
                 <rect x="3" y="4" width="18" height="16" rx="2"/>
                 <circle cx="8.5" cy="9.5" r="1.5"/>
                 <path d="m21 16-4.5-4.5L9 19" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         @elseif($icon === 'avatar')
-            <svg class="h-10 w-10 text-stone-400 dark:text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
+            <svg class="h-10 w-10 text-stone-500 dark:text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
                 <circle cx="12" cy="8" r="3.5"/>
                 <path d="M4.5 20a7.5 7.5 0 0 1 15 0" stroke-linecap="round"/>
             </svg>
         @else
-            <svg class="h-8 w-8 text-stone-400 dark:text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
+            <svg class="h-8 w-8 text-stone-500 dark:text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
                 <circle cx="12" cy="12" r="8.5"/>
                 <path d="M12 8v8M8 12h8" stroke-linecap="round"/>
             </svg>

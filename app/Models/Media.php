@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as SpatieMedia;
+use Spatie\MediaLibrary\Support\PathGenerator\PathGeneratorFactory;
 use Throwable;
 
 /**
@@ -25,27 +27,47 @@ use Throwable;
 class Media extends SpatieMedia
 {
     /**
+     * Conversion file names found on disk for this row, keyed by conversion
+     * name. Null until first asked, then reused for every conversion on it.
+     *
+     * @var array<string, string>|null
+     */
+    private ?array $conversionFileIndex = null;
+
+    /**
      * The first of $conversionNames that exists, falling back to the original.
      *
-     * Spatie's version is re-implemented here for one reason: it reads
-     * hasGeneratedConversion() from the database but then asks the *registered*
-     * conversions for a path, and the two are allowed to disagree - a host with
-     * no GD registers nothing (see HasResponsiveMedia) while the row still says
-     * the file was generated. On that host parent::getAvailableUrl() would throw
-     * InvalidConversion out of every view, admin list and og:image in the app,
-     * taking the site down to save a round trip. Catching it and serving the
-     * original costs nothing when the two agree and keeps the pages up when
-     * they do not.
+     * Spatie's version is re-implemented here because its two halves are
+     * allowed to disagree. It reads hasGeneratedConversion() from the database
+     * but then asks the *registered* conversions for a path, and registration
+     * is gated on an image library (see HasResponsiveMedia): on a host with no
+     * GD and no Imagick, ConversionCollection comes back empty, so
+     * parent::getAvailableUrl() throws InvalidConversion out of every view,
+     * admin list and og:image in the app.
+     *
+     * Serving the original in that case kept the pages up but quietly made
+     * every image full-size - the thumbnail and medium copies were on disk the
+     * whole time, and the row said so. publishedConversionUrl() now answers
+     * from the files themselves, so a shipped conversion is served whether or
+     * not this host could have encoded it.
      *
      * @param  array<int, string>  $conversionNames
      */
     public function getAvailableUrl(array $conversionNames): string
     {
-        try {
-            return parent::getAvailableUrl($conversionNames);
-        } catch (Throwable) {
-            return $this->getUrl();
+        foreach ($conversionNames as $conversionName) {
+            if (! $this->hasGeneratedConversion($conversionName)) {
+                continue;
+            }
+
+            $url = $this->publishedConversionUrl($conversionName);
+
+            if ($url !== null) {
+                return $url;
+            }
         }
+
+        return $this->getUrl();
     }
 
     /**
@@ -102,18 +124,17 @@ class Media extends SpatieMedia
                 continue;
             }
 
-            try {
-                $candidates[$width] = $this->getUrl($name);
-            } catch (Throwable) {
-                // The database says this conversion was generated but the
-                // conversion itself is no longer registered - which happens
-                // whenever responsive_widths is edited to drop a width after
-                // files already exist. hasGeneratedConversion() only reads the
-                // database, so without this the very next getUrl() call would
-                // throw InvalidConversion and take the whole page with it. The
+            $url = $this->publishedConversionUrl($name);
+
+            if ($url === null) {
+                // Either the row never claimed this conversion, or the file it
+                // promised is not on disk. Advertising it anyway would hand the
+                // browser a 404 where the original would have rendered, so the
                 // original below still covers the range.
                 continue;
             }
+
+            $candidates[$width] = $url;
         }
 
         if ($conversionNames === [] && $originalWidth > 0) {
@@ -129,6 +150,141 @@ class Media extends SpatieMedia
         return collect($candidates)
             ->map(fn (string $url, int $width): string => $url.' '.$width.'w')
             ->implode(', ');
+    }
+
+    /**
+     * URL of a generated conversion, or null when there is nothing to serve.
+     *
+     * Spatie is asked first. When it has the conversion registered - a host
+     * with an image library - its answer is authoritative and already correct
+     * for this host's URL configuration, so nothing here changes.
+     *
+     * What this adds is the answer for the other case. Spatie builds a
+     * conversion's path from the Conversion object, and with no image library
+     * loaded there is no Conversion to build it from, so it throws even though
+     * the bytes are sitting on disk. Rather than reconstruct Spatie's naming
+     * rules, the conversions directory is listed once per media instance and
+     * matched against the upload's own stem - `{upload}-{conversion}.{ext}` -
+     * which is what Spatie wrote when the file was made. Only a file that is
+     * actually present is ever returned, so an entry can no longer name a 404.
+     *
+     * Listing the directory also keeps this honest about extensions: the copy
+     * of a `.jpeg` is written as `.jpg`, and several inputs would have needed
+     * a rule this class would rather not own.
+     *
+     * @return array{url: string, path: string}|null
+     */
+    private function publishedConversionUrl(string $conversionName): ?string
+    {
+        try {
+            return $this->getUrl($conversionName);
+        } catch (Throwable) {
+            // No image library registered it - fall through to the files.
+        }
+
+        $fileName = $this->conversionFileIndex()[$conversionName] ?? null;
+
+        if ($fileName === null) {
+            return null;
+        }
+
+        $diskName = $this->conversions_disk ?: $this->disk;
+
+        try {
+            $disk = Storage::disk($diskName);
+            $relative = $this->conversionRelativeDirectory().$fileName;
+        } catch (Throwable) {
+            return null;
+        }
+
+        try {
+            return $disk->url($relative);
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Conversion file names in this media's conversions directory, keyed by
+     * conversion name: `medium` => `Upload-medium.jpg`.
+     *
+     * Resolved once per media instance and reused by every conversion this
+     * row asks for, so a page of fifty pictures opens fifty directories rather
+     * than a hundred, and an unreadable directory simply yields no conversions.
+     *
+     * @return array<string, string>
+     */
+    private function conversionFileIndex(): array
+    {
+        if ($this->conversionFileIndex !== null) {
+            return $this->conversionFileIndex;
+        }
+
+        $this->conversionFileIndex = [];
+
+        $directory = $this->conversionAbsoluteDirectory();
+
+        if ($directory === null || ! is_dir($directory)) {
+            return $this->conversionFileIndex;
+        }
+
+        try {
+            $entries = scandir($directory) ?: [];
+        } catch (Throwable) {
+            return $this->conversionFileIndex;
+        }
+
+        $stem = pathinfo((string) $this->file_name, PATHINFO_FILENAME);
+        $pattern = '/^'.preg_quote($stem, '/').'-([^.]+)\.[^.]+$/';
+
+        foreach ($entries as $entry) {
+            if (preg_match($pattern, $entry, $matches) !== 1) {
+                continue;
+            }
+
+            if (! is_file($directory.DIRECTORY_SEPARATOR.$entry)) {
+                continue;
+            }
+
+            $this->conversionFileIndex[$matches[1]] = $entry;
+        }
+
+        return $this->conversionFileIndex;
+    }
+
+    /**
+     * This media's conversions directory relative to its disk root, e.g.
+     * `167/conversions/`, as Spatie's path generator reports it.
+     *
+     * Asked of the generator rather than assembled here so a custom path
+     * generator keeps working without this class needing to know about it.
+     */
+    private function conversionRelativeDirectory(): string
+    {
+        try {
+            return PathGeneratorFactory::create($this)->getPathForConversions($this);
+        } catch (Throwable) {
+            return $this->id.'/'.config('media-library.conversions_dir_name', 'conversions').'/';
+        }
+    }
+
+    /**
+     * Absolute filesystem path of that directory, or null when the disk is
+     * not reachable from this host - a missing key, a misconfigured disk.
+     *
+     * Only used to decide whether a file exists; the URL is always built from
+     * the relative path so it goes through the same configuration as any other
+     * media link.
+     */
+    private function conversionAbsoluteDirectory(): ?string
+    {
+        $diskName = $this->conversions_disk ?: $this->disk;
+
+        try {
+            return Storage::disk($diskName)->path($this->conversionRelativeDirectory());
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     /**

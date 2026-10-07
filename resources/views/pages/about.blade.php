@@ -64,7 +64,7 @@
                                         <path d="{{ $principle['icon'] }}"/>
                                     </svg>
                                 </div>
-                                <h3 class="font-medium text-stone-900 dark:text-white mb-2">{{ $principle['title'] }}</h3>
+                                <h3 class="font-medium text-heading-md text-stone-900 dark:text-white mb-2">{{ $principle['title'] }}</h3>
                                 <p class="text-body-sm text-stone-600 dark:text-stone-400">{{ $principle['text'] }}</p>
                             </div>
                         </div>
@@ -76,7 +76,7 @@
 
     {{-- Disciplines --}}
     @if($disciplines->isNotEmpty())
-        <section class="section bg-stone-50 dark:bg-stone-900/50" aria-labelledby="disciplines-heading">
+        <section class="section section-alt" aria-labelledby="disciplines-heading">
             <div class="container">
                 <div class="text-center max-w-3xl mx-auto mb-14">
                     <p class="text-overline text-accent-600 mb-4">What We Do</p>
@@ -162,7 +162,7 @@
                                     <path d="{{ $stage['icon'] }}"/>
                                 </svg>
                             </div>
-                            <h3 class="font-medium text-stone-900 dark:text-white mb-2">{{ $stage['title'] }}</h3>
+                            <h3 class="font-medium text-heading-md text-stone-900 dark:text-white mb-2">{{ $stage['title'] }}</h3>
                             <p class="text-body-sm text-stone-600 dark:text-stone-400">{{ $stage['text'] }}</p>
                         </div>
                     </li>
@@ -206,10 +206,10 @@
                                         <p>{!! nl2br(e($office->address)) !!}</p>
                                     @endif
                                     @if($office->phone)
-                                        <p><a href="tel:{{ preg_replace('/[^0-9+]/', '', $office->phone) }}" class="hover:text-accent-600">{{ $office->phone }}</a></p>
+                                        <p><a href="tel:{{ preg_replace('/[^0-9+]/', '', $office->phone) }}" class="inline-block py-1.5 hover:text-accent-600">{{ $office->phone }}</a></p>
                                     @endif
                                     @if($office->email)
-                                        <p><a href="mailto:{{ $office->email }}" class="hover:text-accent-600 break-all">{{ $office->email }}</a></p>
+                                        <p><a href="mailto:{{ $office->email }}" class="inline-block py-1.5 hover:text-accent-600 break-all">{{ $office->email }}</a></p>
                                     @endif
                                 </address>
                             </div>

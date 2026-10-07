@@ -70,7 +70,7 @@
                     <div class="space-y-6">
                         @forelse($offices as $office)
                             <div class="pb-6 border-b border-stone-200 last:border-0 last:pb-0 dark:border-stone-800">
-                                <h3 class="font-medium text-stone-900 dark:text-white mb-2">{{ $office->name }}</h3>
+                                <h3 class="font-medium text-heading-md text-stone-900 dark:text-white mb-2">{{ $office->name }}</h3>
 
                                 @if($office->address)
                                     <address class="not-italic text-body-sm text-stone-600 dark:text-stone-400">{!! nl2br(e($office->address)) !!}</address>
@@ -78,7 +78,7 @@
 
                                 <div class="mt-2 space-y-1 text-body-sm">
                                     @if($office->phone)
-                                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $office->phone) }}" class="flex items-center gap-2 text-stone-600 hover:text-accent-600 dark:text-stone-400">
+                                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $office->phone) }}" class="flex items-center gap-2 py-2.5 text-stone-600 hover:text-accent-600 dark:text-stone-400">
                                             <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 0 1 2-2h2l2 5-2 1a12 12 0 0 0 6 6l1-2 5 2v2a2 2 0 0 1-2 2A17 17 0 0 1 3 5Z"/>
                                             </svg>
@@ -86,7 +86,7 @@
                                         </a>
                                     @endif
                                     @if($office->email)
-                                        <a href="mailto:{{ $office->email }}" class="flex items-center gap-2 text-stone-600 hover:text-accent-600 dark:text-stone-400 break-all">
+                                        <a href="mailto:{{ $office->email }}" class="flex items-center gap-2 py-2.5 text-stone-600 hover:text-accent-600 dark:text-stone-400 break-all">
                                             <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 6h18v12H3zM3 7l9 6 9-6"/>
                                             </svg>
@@ -113,7 +113,7 @@
     </div>
 
     {{-- Find us on the map --}}
-    <section class="section bg-stone-50 dark:bg-stone-900/40" aria-labelledby="map-heading">
+    <section class="section section-alt" aria-labelledby="map-heading">
         <div class="container">
             <div class="text-center max-w-3xl mx-auto mb-14">
                 <p class="text-overline text-accent-600 mb-4">Find Us</p>
